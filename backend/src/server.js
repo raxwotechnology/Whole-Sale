@@ -64,6 +64,10 @@ dotenv.config();
 connectDB().then(async () => {
     await seedDefaults();
     try {
+        // Drop problematic legacy index if it exists
+        const { default: PettyCash } = await import('./models/PettyCash.js');
+        await PettyCash.collection.dropIndex('voucherCode_1').catch(() => {});
+        
         const { default: excelService } = await import('./services/excelService.js');
         await excelService.syncAllFilesToDB();
     } catch (err) {
